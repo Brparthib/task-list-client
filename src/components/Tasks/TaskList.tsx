@@ -1,4 +1,4 @@
-import type { Task } from '@/types/types';
+import type { Priority, Task } from '@/types/types';
 import { useTasksStore } from '../../stores/useTasksStore';
 import TaskItem from './TaskItem';
 import { useOptimistic } from 'react';
@@ -9,7 +9,11 @@ export default function TaskList() {
   // useOptimistic: base value = tasks array
   const [optimisticTasks, addOptimistic] = useOptimistic<Task[], { id: string; title: string, priority: string }>(
     tasks,
-    (current, updated) => current.map((task) => (task.id === updated.id ? { ...task, title: updated.title } : task))
+    (current, updated) => current.map((task) => (task.id === updated.id ? { 
+      ...task, 
+      title: updated.title, 
+      priority: updated.priority as Priority
+    } : task))
   );
 
   return (

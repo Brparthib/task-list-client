@@ -35,6 +35,8 @@ export default function TaskItem({ task, addOptimistic }: Props) {
   const rollbackUpdate = useTasksStore((state) => state.rollbackUpdate);
   const getTaskById = useTasksStore((state) => state.getTaskById);
 
+  console.log(task);
+
   const startEdit = () => {
     setEditing(true);
     setValue("title", task.title);
@@ -49,6 +51,7 @@ export default function TaskItem({ task, addOptimistic }: Props) {
   const onSubmit = handleSubmit(async (values) => {
     const newTitle = values.title.trim() as string;
     const newPriority = values.priority as Priority;
+
     if (!newTitle) {
       toast.error("Title cannot be empty");
       return;
@@ -68,13 +71,15 @@ export default function TaskItem({ task, addOptimistic }: Props) {
     // taskList will rerender using optimisticTasks
     addOptimistic({ id: task.id, title: newTitle, priority: newPriority });
 
+    updateTaskOptimistic(task.id, { title: newTitle, priority: newPriority });
+    
+    setEditing(false);
     
     // it will not update to final store until API success, but we need to keep previous task to rollback.
     try {
       // Fake API
       await fakeApiUpdate({ id: task.id, title: newTitle, priority: newPriority }, 2000);
       // success -> commit to Zustand final state
-      updateTaskOptimistic(task.id, { title: newTitle, priority: newPriority });
       toast.success("Saved Successfully");
     } catch (err) {
       console.log("Error: ", err);
